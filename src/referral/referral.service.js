@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
-import REF from 'src/models/ref_object_model';
+import REF from 'src/models/ref.model';
+import { processReferralRetrieval } from 'src/utils/data_preprocessor';
 import { generateRefCode } from 'src/utils/ref_code_generator';
 
 @Injectable()
@@ -48,13 +49,16 @@ export class ReferralService {
     
     const parentRef = await REF.findOne({referralID : referralId});
 
+    const refCode = await generateRefCode();
+
     if(!parentRef) 
       throw new HttpException('Invalid Referral Code!', HttpStatus.CONFLICT);
 
     try {
       const newRefObject = await REF.create({
         userID,
-        referralID: referralId,
+        referralID: refCode,
+        masterReferrer : parentRef.userID,
         userStatus: 'SIGNED_UP',
       });
 
@@ -67,8 +71,21 @@ export class ReferralService {
       throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
     }
   }
-
-  async retrieveRef(userId){
-    
+  
+  async retrieveRef(userId) {
+    const userID = new mongoose.Types.ObjectId(userId);
+  
+    const refObject = await REF.findOne({ userID }).populate({
+      path: 'linkedAccounts',
+      select: 'fullName email phoneNumber'
+    }).populate({
+      path: 'masterReferrer',
+      select: 'fullName email phoneNumber'
+    });
+  
+    if (!refObject)
+      throw new HttpException('UserId Invalid', HttpStatus.NOT_FOUND);
+  
+    return processReferralRetrieval(refObject); // For the processing of data
   }
 }

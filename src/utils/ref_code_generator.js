@@ -1,4 +1,4 @@
-import REF from "src/models/ref_object_model";
+import REF from "src/models/ref.model";
 
 export async function generateRefCode() {
   const characters =

@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import CUSTOMER from "./customer.model";
 
 const RefSchema = new mongoose.Schema({
     referralID : {
@@ -18,6 +19,11 @@ const RefSchema = new mongoose.Schema({
         type : [mongoose.Types.ObjectId],
         ref : 'customers',
         default : []
+    },
+    masterReferrer : {
+        type : mongoose.Types.ObjectId,
+        ref : 'customers',
+        default : null
     }
 },{
     timestamps : true

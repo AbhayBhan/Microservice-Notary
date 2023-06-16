@@ -3,7 +3,6 @@ import { AppModule } from './app.module';
 import mongoose from 'mongoose';
 import { Logger } from 'nestjs-pino';
 
-
 // Activate this to Log Requests in console.
 // async function bootstrap() {
 //   const app = await NestFactory.create(AppModule, {bufferLogs : true});
@@ -13,12 +12,17 @@ import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  mongoose.connect(process.env.MONGO_CONN_KEY)
+  mongoose
+    .connect(process.env.MONGO_CONN_KEY, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    })
     .then(async () => {
       await app.listen(process.env.NODE_PORT);
-    }).catch((err) => {
-      console.log(err);
     })
+    .catch((err) => {
+      console.log(err);
+    });
 }
 
 bootstrap();
