@@ -12,6 +12,7 @@ import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.enableCors();
   mongoose
     .connect(process.env.MONGO_CONN_KEY, {
       useNewUrlParser: true,
