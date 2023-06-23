@@ -1,0 +1,31 @@
+service: notary-microservice
+useDotenv: true
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    noPrependStageInUrl: true
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: us-west-2
+  environment:
+    NODE_PORT = ${env:NODE_PORT}
+    MONGO_CONN_KEY = ${env:MONGO_CONN_KEY}
+    STRIPE_PUBLISHABLE_KEY = ${env:STRIPE_PUBLISHABLE_KEY}
+    STRIPE_SECRET_KEY = ${env:STRIPE_SECRET_KEY}
+
+functions:
+  main:
+    handler : dist/serverless.handler
+    events:
+      - http:
+          method: ANY
+          path: /
+          cors: true
+      - http:
+          method: ANY
+          path: '{proxy+}'
+          cors: true
