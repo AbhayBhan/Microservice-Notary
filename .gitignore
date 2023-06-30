@@ -1,6 +1,7 @@
 # compiled output
 /dist
 /node_modules
+/.serverless
 
 # Logs
 logs
@@ -36,6 +37,3 @@ lerna-debug.log*
 
 # env
 .env
-.env.prod
-
-/.serverless
