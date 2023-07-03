@@ -6,6 +6,16 @@ import { generateRefCode } from 'src/utils/ref_code_generator';
 
 @Injectable()
 export class ReferralService {
+  async searchRef(refcode){
+    const refExists = await REF.findOne({referralID : refcode});
+
+    if(refExists){
+      return {status : 1};
+    }else{
+      return {status : 0};
+    }
+  }
+
   async createNewRef(reqBody) {
     const { userId } = reqBody;
 

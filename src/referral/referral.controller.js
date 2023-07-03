@@ -7,6 +7,11 @@ export class ReferralController{
         this.referralService = new ReferralService();
     }
 
+    @Get('search/:refcode')
+    checkRef(@Param('refcode') refcode){
+        return this.referralService.searchRef(refcode);
+    }
+
     @Post('/create-new-ref')
     createRef(@Body() reqBody){
         const {referralId} = reqBody;
