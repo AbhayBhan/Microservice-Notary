@@ -13,6 +13,7 @@ export class SubscriptionService {
     switch (event.type) {
       case 'payment_intent.succeeded':
         const paymentIntent = event.data.object;
+        console.log(event.data);
         console.log(
           `PaymentIntent for ${paymentIntent.amount} was successful!`,
         );
