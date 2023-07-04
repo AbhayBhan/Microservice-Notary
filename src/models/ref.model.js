@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { trusted } from "mongoose";
 import CUSTOMER from "./customer.model";
 
 const RefSchema = new mongoose.Schema({
@@ -12,6 +12,10 @@ const RefSchema = new mongoose.Schema({
         required : true
     },
     userStatus : {
+        type : String,
+        required : true
+    },
+    email : {
         type : String,
         required : true
     },

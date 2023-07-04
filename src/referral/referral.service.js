@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import mongoose from 'mongoose';
 import REF from 'src/models/ref.model';
+import USER from 'src/models/customer.model';
 import { processReferralRetrieval } from 'src/utils/data_preprocessor';
 import { generateRefCode } from 'src/utils/ref_code_generator';
 
@@ -31,11 +32,14 @@ export class ReferralService {
 
     const refCode = await generateRefCode();
 
+    const {email} = await USER.findById(userID);
+
     try {
       const newRefObject = await REF.create({
         userID,
         referralID: refCode,
         userStatus: 'SIGNED_UP',
+        email : email
       });
 
       return newRefObject;
@@ -63,6 +67,8 @@ export class ReferralService {
 
     if(!parentRef) 
       throw new HttpException('Invalid Referral Code!', HttpStatus.CONFLICT);
+    
+      const {email} = await USER.findById(userID);
 
     try {
       const newRefObject = await REF.create({
@@ -70,6 +76,7 @@ export class ReferralService {
         referralID: refCode,
         masterReferrer : parentRef.userID,
         userStatus: 'SIGNED_UP',
+        email : email
       });
 
       parentRef.linkedAccounts.push(userID);

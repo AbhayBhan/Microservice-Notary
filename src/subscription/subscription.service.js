@@ -8,6 +8,9 @@ export class SubscriptionService {
     this.endpointSecret = "whsec_ce4581159005ef971fbc95e7bd44523794033bcac5b9600d72cc34d73fd888be";
   }
 
+  //Required Webhooks
+  //invoice.payment_succeeded
+
   async webhookEvents(reqbody) {
     let event = reqbody.body;
     switch (event.type) {
