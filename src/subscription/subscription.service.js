@@ -1,38 +1,48 @@
 import { Injectable } from '@nestjs/common';
-import Stripe from 'stripe';
+import SUB from 'src/models/sub.model';
+import USER from 'src/models/customer.model';
+import REF from 'src/models/ref.model';
 
 @Injectable()
 export class SubscriptionService {
-  constructor() {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-    this.endpointSecret = "whsec_ce4581159005ef971fbc95e7bd44523794033bcac5b9600d72cc34d73fd888be";
+  async UpgradeSubscription(data) {}
+
+  async UpdateSubscription(data) {}
+
+  async CancelSubscription(data) {
   }
 
-  //Required Webhooks
-  //invoice.payment_succeeded
+  async AddSubscription(data) {
+    const {
+      customer,
+      amount_paid,
+      customer_address,
+      customer_email,
+      period_start,
+      period_end,
+      subscription,
+    } = data.object;
 
-  async webhookEvents(reqbody) {
-    let event = reqbody.body;
-    switch (event.type) {
-      case 'payment_intent.succeeded':
-        const paymentIntent = event.data.object;
-        console.log(event.data);
-        console.log(
-          `PaymentIntent for ${paymentIntent.amount} was successful!`,
-        );
-        // Then define and call a method to handle the successful payment intent.
-        // handlePaymentIntentSucceeded(paymentIntent);
-        break;
-      case 'payment_method.attached':
-        const paymentMethod = event.data.object;
-        // Then define and call a method to handle the successful attachment of a PaymentMethod.
-        // handlePaymentMethodAttached(paymentMethod);
-        break;
-      default:
-        // Unexpected event type
-        console.log(`Unhandled event type ${event.type}.`);
-    }
+    const {
+      product
+    } = data.object.lines.data[0].plan;
 
-    return event;
+    const {_id} = await USER.findOne({email : customer_email});
+
+    await SUB.create({
+      amount : amount_paid,
+      customerId : customer,
+      userId : _id,
+      email : customer_email,
+      subscription_Active : true,
+      subscriptionId : subscription,
+      subscriptionName : product,
+      startDate : period_start,
+      endDate : period_end
+    });
+
+    const ref = await REF.findOne({userID : _id});
+    ref.userStatus = "ACTIVE";
+    await ref.save();
   }
 }

@@ -1,4 +1,4 @@
-import mongoose, { trusted } from "mongoose";
+import mongoose from "mongoose";
 import CUSTOMER from "./customer.model";
 
 const RefSchema = new mongoose.Schema({
