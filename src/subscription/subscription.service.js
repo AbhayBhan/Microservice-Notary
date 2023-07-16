@@ -40,7 +40,6 @@ export class SubscriptionService {
     const {
       customer,
       amount_paid,
-      customer_address,
       customer_email,
       subscription,
     } = data.object;
@@ -53,12 +52,16 @@ export class SubscriptionService {
       product
     } = data.object.lines.data[0].plan;
 
-    const {_id} = await USER.findOne({email : customer_email});
+    const user = await USER.findOne({email : customer_email});
+
+    if(!user){
+      return;
+    }
 
     await SUB.create({
       amount : amount_paid,
       customerId : customer,
-      userId : _id,
+      userId : user._id,
       email : customer_email,
       subscription_Active : true,
       subscriptionId : subscription,
@@ -67,7 +70,7 @@ export class SubscriptionService {
       endDate : end
     });
 
-    const ref = await REF.findOne({userID : _id});
+    const ref = await REF.findOne({userID : user._id});
     ref.userStatus = "ACTIVE";
     await ref.save();
   }
