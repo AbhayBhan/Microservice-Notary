@@ -7,9 +7,33 @@ import REF from 'src/models/ref.model';
 export class SubscriptionService {
   async UpgradeSubscription(data) {}
 
-  async UpdateSubscription(data) {}
+  async UpdateSubscription(data) {
+    const {customer, amount_paid} = data.object;
+
+    const sub = await SUB.findOne({customerId : customer});
+
+    if(!sub){
+      return;
+    }
+
+    const {
+      end
+    } = data.object.lines.data[0].period;
+
+    sub.amount = amount_paid;
+    sub.endDate = end;
+
+    await sub.save();
+  }
 
   async CancelSubscription(data) {
+    const {subscription} = data.object.items.data[0];
+
+    const sub = await SUB.findOneAndDelete({subscriptionId : subscription});
+
+    const ref = await REF.findOne({email : sub.email});
+    ref.userStatus = "INACTIVE";
+    await ref.save();
   }
 
   async AddSubscription(data) {
@@ -18,10 +42,12 @@ export class SubscriptionService {
       amount_paid,
       customer_address,
       customer_email,
-      period_start,
-      period_end,
       subscription,
     } = data.object;
+
+    const {
+      end, start
+    } = data.object.lines.data[0].period;
 
     const {
       product
@@ -37,8 +63,8 @@ export class SubscriptionService {
       subscription_Active : true,
       subscriptionId : subscription,
       subscriptionName : product,
-      startDate : period_start,
-      endDate : period_end
+      startDate : start,
+      endDate : end
     });
 
     const ref = await REF.findOne({userID : _id});
