@@ -5,10 +5,14 @@ import REF from 'src/models/ref.model';
 
 @Injectable()
 export class SubscriptionService {
-  async UpgradeSubscription(data) {}
+  async UpgradeSubscription(data) {
+    const { customer } = data.object;
 
-  async UpdateSubscription(data) {
-    const {customer, amount_paid} = data.object;
+    const { amount } = data.object.lines.data[1];
+
+    const { end } = data.object.lines.data[1].period;
+
+    const { product } = data.object.lines.data[1].plan;
 
     const sub = await SUB.findOne({customerId : customer});
 
@@ -16,9 +20,23 @@ export class SubscriptionService {
       return;
     }
 
-    const {
-      end
-    } = data.object.lines.data[0].period;
+    sub.amount = amount;
+    sub.endDate = end;
+    sub.subscriptionName = product;
+
+    await sub.save();
+  }
+
+  async UpdateSubscription(data) {
+    const { customer, amount_paid } = data.object;
+
+    const sub = await SUB.findOne({ customerId: customer });
+
+    if (!sub) {
+      return;
+    }
+
+    const { end } = data.object.lines.data[0].period;
 
     sub.amount = amount_paid;
     sub.endDate = end;
@@ -27,51 +45,42 @@ export class SubscriptionService {
   }
 
   async CancelSubscription(data) {
-    const {subscription} = data.object.items.data[0];
+    const { subscription } = data.object.items.data[0];
 
-    const sub = await SUB.findOneAndDelete({subscriptionId : subscription});
+    const sub = await SUB.findOneAndDelete({ subscriptionId: subscription });
 
-    const ref = await REF.findOne({email : sub.email});
-    ref.userStatus = "INACTIVE";
+    const ref = await REF.findOne({ email: sub.email });
+    ref.userStatus = 'INACTIVE';
     await ref.save();
   }
 
   async AddSubscription(data) {
-    const {
-      customer,
-      amount_paid,
-      customer_email,
-      subscription,
-    } = data.object;
+    const { customer, amount_paid, customer_email, subscription } = data.object;
 
-    const {
-      end, start
-    } = data.object.lines.data[0].period;
+    const { end, start } = data.object.lines.data[0].period;
 
-    const {
-      product
-    } = data.object.lines.data[0].plan;
+    const { product } = data.object.lines.data[0].plan;
 
-    const user = await USER.findOne({email : customer_email});
+    const user = await USER.findOne({ email: customer_email });
 
-    if(!user){
+    if (!user) {
       return;
     }
 
     await SUB.create({
-      amount : amount_paid,
-      customerId : customer,
-      userId : user._id,
-      email : customer_email,
-      subscription_Active : true,
-      subscriptionId : subscription,
-      subscriptionName : product,
-      startDate : start,
-      endDate : end
+      amount: amount_paid,
+      customerId: customer,
+      userId: user._id,
+      email: customer_email,
+      subscription_Active: true,
+      subscriptionId: subscription,
+      subscriptionName: product,
+      startDate: start,
+      endDate: end,
     });
 
-    const ref = await REF.findOne({userID : user._id});
-    ref.userStatus = "ACTIVE";
+    const ref = await REF.findOne({ userID: user._id });
+    ref.userStatus = 'ACTIVE';
     await ref.save();
   }
 }
