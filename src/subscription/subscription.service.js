@@ -83,4 +83,23 @@ export class SubscriptionService {
     ref.userStatus = 'ACTIVE';
     await ref.save();
   }
+
+  async FailedPayment(data){
+    const {customer, amount_remaining, hosted_invoice_url} = data.object;
+
+    const sub = await SUB.findOne({customerId : customer});
+
+    if(!sub){
+      return;
+    }
+
+    sub.subscription_Active = false;
+
+    const ref = await REF.findOne({userID : sub.userId});
+
+    ref.userStatus = 'INACTIVE';
+
+    await ref.save();
+    await sub.save();
+  }
 }

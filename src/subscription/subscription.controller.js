@@ -34,6 +34,11 @@ export class SubscriptionController {
           }
         case('customer.subscription.deleted') :
           return this.subscriptionService.CancelSubscription(event.data);
+
+        case('invoice.payment_failed') :
+          if(event.data.object.billing_reason === 'subscription_cycle'){
+            return this.subscriptionService.FailedPayment(event.data);
+          }
     }
   }
 }
