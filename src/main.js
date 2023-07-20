@@ -11,6 +11,7 @@ async function bootstrap() {
       useUnifiedTopology: true
     })
     .then(async () => {
+      console.log("Mongoose Connection Made");
       await app.listen(process.env.NODE_PORT);
     })
     .catch((err) => {

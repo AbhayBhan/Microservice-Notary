@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { ReferralModule } from './referral/referral.module';
 import { SubscriptionModule } from './subscription/subscription.module';
+import { PayoutModule } from './payout/payout.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { SubscriptionModule } from './subscription/subscription.module';
     }),
     ReferralModule,
     SubscriptionModule,
+    PayoutModule,
   ],
   controllers: [AppController],
   providers: [AppService],

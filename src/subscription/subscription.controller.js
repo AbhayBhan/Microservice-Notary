@@ -1,4 +1,4 @@
-import { Controller, Post, Request, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Post, Request, Get, Param } from '@nestjs/common';
 import { SubscriptionService } from './subscription.service';
 import Stripe from 'stripe';
 
@@ -8,6 +8,11 @@ export class SubscriptionController {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
     this.endpointSecret = process.env.STRIPE_ENDPOINT_SECRET;
     this.subscriptionService = new SubscriptionService();
+  }
+
+  @Get('/fetch/:id')
+  getSubscriptionDetails(@Param('id') id){
+    return this.subscriptionService.getSubscription(id);
   }
 
   @Post('/webhook')
