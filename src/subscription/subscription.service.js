@@ -74,6 +74,11 @@ export class SubscriptionService {
 
     sub.amount = amount_paid;
     sub.endDate = end;
+    sub.subscription_Active = true;
+
+    const ref = await REF.findOne({ userID: user._id });
+    ref.userStatus = 'ACTIVE';
+    await ref.save();
 
     await sub.save();
   }
@@ -99,6 +104,12 @@ export class SubscriptionService {
 
     if (!user) {
       return;
+    }
+
+    const sub = await SUB.findOne({ email : customer_email });
+
+    if(sub){
+      await sub.deleteOne();
     }
 
     await SUB.create({
