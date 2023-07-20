@@ -76,7 +76,7 @@ export class SubscriptionService {
     sub.endDate = end;
     sub.subscription_Active = true;
 
-    const ref = await REF.findOne({ userID: user._id });
+    const ref = await REF.findOne({ userID: sub.userId });
     ref.userStatus = 'ACTIVE';
     await ref.save();
 
