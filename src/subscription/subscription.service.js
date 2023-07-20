@@ -25,14 +25,16 @@ export class SubscriptionService {
         status : 1,
         product : sub.subscriptionName,
         startDate : sub.startDate,
-        endDate : sub.endDate
+        endDate : sub.endDate,
+        amount : sub.amount
       }
     }else{
       return {
         status : 2,
         product : sub.subscriptionName,
         startDate : sub.startDate,
-        endDate : sub.endDate
+        endDate : sub.endDate,
+        amount : sub.amount
       }
     }
   }
